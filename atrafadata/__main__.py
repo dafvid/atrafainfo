@@ -6,14 +6,10 @@ from pprint import pformat
 import anvil
 from jinja2 import Environment, PackageLoader, select_autoescape
 
+from atrafadata import eprint
+
 server_path = '/var/opt/minecraft/server'
 data_path = os.path.join(server_path, 'world', 'region')
-
-print('atrafainfo')
-
-
-def eprint(s):
-    print(s, file=sys.stderr)
 
 
 def coord_to_chunk(x, z):
@@ -88,7 +84,7 @@ def chuck_map(startx, endx, startz, endz):
 
 
 jenv = Environment(
-    loader=PackageLoader('atrafainfo'),
+    loader=PackageLoader('atrafadata'),
     autoescape=select_autoescape(['html'])
 )
 x = (258, 311)
