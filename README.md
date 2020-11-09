@@ -1,4 +1,5 @@
 # atrafaweb
+Serves a static web page generated from Minecraft map data. 
 
 ## Setup
 1. Install Homebrew
@@ -10,5 +11,7 @@
 7. `venv/bin/pip install -U wheel`
 8. `venv/bin/pip install -r requirements.txt`
 
-## Create test data
-1. `python3 test.py`
+## How to: change the look and feel of the webpage
+1. Update the web resources in /web 
+2. Update the HTML-template in atrafadata/templates
+3. Generate a new index.html in /web using `python3 test.py`
