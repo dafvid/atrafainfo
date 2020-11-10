@@ -16,10 +16,12 @@
 <h2>Sälj</h2>
 <ul>
 {% for k, v in data.buy.items() %}
+    <!-- Start of buy item -->
 <li>
     {{k}}
     <ul>
         {% for o in v %}
+        <!-- Start of buy offer -->
             <li>
                 {{ print_item(o.buy) }}
                 {% if o.buyB -%}
@@ -27,19 +29,23 @@
                 {%- endif %}
                 --> {{ print_item(o.sell) }} @ {{ o.villager.profession }}
             </li>
+        <!-- End of buy offer -->
         {% endfor %}
     </ul>
 </li>
+    <!-- End of buy item -->
 {% endfor %}
 </ul>
 
 <h2>Köp</h2>
 <ul>
     {% for k, v in data.sell.items() %}
+    <!-- Start of sell item -->
     <li>
         {{k}}
         <ul>
             {% for o in v %}
+            <!-- Start of sell offer -->
             <li>
                 {{ print_item(o.buy) }}
                 {% if o.buyB -%}
@@ -47,17 +53,21 @@
                 {%- endif %}
                 --> {{ print_item(o.sell) }} @ {{ o.villager.profession }}
             </li>
+            <!-- End of sell offer -->
             {% endfor %}
         </ul>
     </li>
+    <!-- End of sell item -->
     {% endfor %}
 </ul>
 
 <h2>Vem bor i byn?</h2>
 <ul>
 {% for v in data.villagers %}
+    <!-- Start of villager item -->
 <li>lvl {{ v.level }}({{ v.xp }} XP) {{ v.profession }} @ {{ v.pos }}</li>
-{% endfor %}
+    <!-- End of villager item -->
+    {% endfor %}
 </ul>
 </body>
 </html>
