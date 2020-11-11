@@ -103,7 +103,7 @@ def region_fn(start, end):
         yield "r.{0}.{1}.mca".format(*d)
 
 
-def export(server_path, test=False):
+def export(server_path, test=False, as_json=False):
     startx = 225
     endx = 310
     startz = -60
@@ -182,5 +182,8 @@ def export(server_path, test=False):
                                 #print("  {} {} -> {} {}".format(o['buy']['Count'], lp(o['buy']['id']).capitalize(), o['sell']['Count'], lp(o['sell']['id']).capitalize()))
                             data['villagers'].append(v)
     eprint(pformat(data))
-    t = jenv.get_template('index.html')
-    return t.render(data=data)
+    if as_json:
+        return json.dumps(data)
+    else:
+        t = jenv.get_template('index.html')
+        return t.render(data=data)
