@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 
@@ -7,6 +8,21 @@ import anvil
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 __version__ = '201109.1'
+
+
+item_data = {}
+
+assets_path = os.path.join(
+    os.path.dirname(
+        os.path.dirname(
+            os.path.realpath(__file__))), 'assets')
+with open(os.path.join(assets_path, 'items.json')) as f:
+    item_data = {x['text_type']: x for x in json.load(f)}
+
+
+def img_fname(item_name):
+    if item_name in item_data:
+        return "{type}-{meta}.png".format(**item_data[item_name])
 
 
 def eprint(s):
@@ -120,6 +136,14 @@ def export(server_path, test=False):
             return
         data[list_name][item_name].append(offer)
 
+    def to_dict(offer_item):
+        name = lp(offer_item['id'])
+        return dict(
+            name=name.capitalize(),
+            count=offer_item['Count'].value,
+            img=img_fname(name)
+        )
+
     for rk, rv in cm.items():
         fp = "r.{0}.{1}.mca".format(*rk)
         region_path = os.path.join(data_path, fp)
@@ -141,23 +165,14 @@ def export(server_path, test=False):
                             v['offers'] = list()
                             for o in e['Offers']['Recipes']:
                                 od = {
-                                    'buy': {
-                                        'name': lp(o['buy']['id']).capitalize(),
-                                        'count': o['buy']['Count'].value
-                                    },
+                                    'buy': to_dict(o['buy']),
                                     'buyB': dict(),
-                                    'sell': {
-                                        'name': lp(o['sell']['id']).capitalize(),
-                                        'count': o['sell']['Count'].value
-                                    },
+                                    'sell': to_dict(o['sell']),
                                     'villager': v
                                 }
                                 # Check buyB
                                 if o['buyB']['id'].value != 'minecraft:air':
-                                    od['buyB'] = {
-                                        'name': lp(o['buyB']['id']).capitalize(),
-                                        'count': o['buyB']['Count'].value
-                                    }
+                                    od['buyB'] = to_dict(o['buyB'])
 
                                 list_add('buy', od['buy']['name'], od)
                                 if od['buyB']:
@@ -166,6 +181,6 @@ def export(server_path, test=False):
                                 v['offers'].append(od)
                                 #print("  {} {} -> {} {}".format(o['buy']['Count'], lp(o['buy']['id']).capitalize(), o['sell']['Count'], lp(o['sell']['id']).capitalize()))
                             data['villagers'].append(v)
-    #eprint(pformat(data))
+    eprint(pformat(data))
     t = jenv.get_template('index.html')
     return t.render(data=data)
