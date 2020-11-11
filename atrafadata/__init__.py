@@ -124,7 +124,7 @@ def export(server_path, test=False, as_json=False):
     data = dict(
         buy=dict(),
         sell=dict(),
-        villagers=list()
+        villagers=dict()
     )
 
     def list_add(list_name, item_name, offer):
@@ -137,12 +137,14 @@ def export(server_path, test=False, as_json=False):
         data[list_name][item_name].append(offer)
 
     def to_dict(offer_item):
-        name = lp(offer_item['id'])
+        name = lp(offer_item['id']).replace('_', ' ')
         return dict(
             name=name.capitalize(),
             count=offer_item['Count'].value,
             img=img_fname(name)
         )
+
+    profession_count = dict()
 
     for rk, rv in cm.items():
         fp = "r.{0}.{1}.mca".format(*rk)
@@ -160,15 +162,22 @@ def export(server_path, test=False, as_json=False):
                                 profession=lp(e['VillagerData']['profession']).capitalize(),
                                 level=e['VillagerData']['level'].value,
                                 xp=e['Xp'].value,
-                                pos=[round(x.value) for x in e['Pos']]
+                                pos=[round(x.value) for x in e['Pos']],
+                                offers=list()
                             )
+                            p = v['profession']
+                            if p not in profession_count:
+                                profession_count[p] = 1
+                            else:
+                                profession_count[p] += 1
+                            v['name'] = "{} {}".format(p, profession_count[p])
                             v['offers'] = list()
                             for o in e['Offers']['Recipes']:
                                 od = {
                                     'buy': to_dict(o['buy']),
                                     'buyB': dict(),
                                     'sell': to_dict(o['sell']),
-                                    'villager': v
+                                    'villager': v['name']
                                 }
                                 # Check buyB
                                 if o['buyB']['id'].value != 'minecraft:air':
@@ -180,8 +189,8 @@ def export(server_path, test=False, as_json=False):
                                 list_add('sell', od['sell']['name'], od)
                                 v['offers'].append(od)
                                 #print("  {} {} -> {} {}".format(o['buy']['Count'], lp(o['buy']['id']).capitalize(), o['sell']['Count'], lp(o['sell']['id']).capitalize()))
-                            data['villagers'].append(v)
-    eprint(pformat(data))
+                            data['villagers'][v['name']] = v
+    #eprint(pformat(data))
     if as_json:
         return json.dumps(data)
     else:

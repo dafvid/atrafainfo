@@ -27,7 +27,7 @@
                 {% if o.buyB -%}
                     , {{ print_item(o.buyB) }}
                 {%- endif %}
-                --> {{ print_item(o.sell) }} @ {{ o.villager.profession }}
+                --> {{ print_item(o.sell) }} @ {{ o.villager.name }}
             </li>
         <!-- End of buy offer -->
         {% endfor %}
@@ -51,7 +51,7 @@
                 {% if o.buyB -%}
                 , {{ print_item(o.buyB) }}
                 {%- endif %}
-                --> {{ print_item(o.sell) }} @ {{ o.villager.profession }}
+                --> {{ print_item(o.sell) }} @ {{ o.villager.name }}
             </li>
             <!-- End of sell offer -->
             {% endfor %}
@@ -63,9 +63,9 @@
 
 <h2>Vem bor i byn?</h2>
 <ul>
-{% for v in data.villagers %}
+{% for k, v in data.villagers.items() %}
     <!-- Start of villager item -->
-<li>lvl {{ v.level }}({{ v.xp }} XP) {{ v.profession }} @ {{ v.pos }}</li>
+<li>{{ k }} lvl {{ v.level }}({{ v.xp }} XP) @ {{ v.pos }}</li>
     <!-- End of villager item -->
     {% endfor %}
 </ul>
