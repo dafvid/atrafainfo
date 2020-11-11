@@ -27,7 +27,7 @@
                 {% if o.buyB -%}
                     , {{ print_item(o.buyB) }}
                 {%- endif %}
-                --> {{ print_item(o.sell) }} @ {{ o.villager.name }}
+                --> {{ print_item(o.sell) }} @ {{ o.villager }}
             </li>
         <!-- End of buy offer -->
         {% endfor %}
@@ -51,7 +51,7 @@
                 {% if o.buyB -%}
                 , {{ print_item(o.buyB) }}
                 {%- endif %}
-                --> {{ print_item(o.sell) }} @ {{ o.villager.name }}
+                --> {{ print_item(o.sell) }} @ {{ o.villager }}
             </li>
             <!-- End of sell offer -->
             {% endfor %}
