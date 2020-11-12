@@ -11,6 +11,7 @@ __version__ = '201112.1'
 
 
 item_data = {}
+entities_data = {}
 
 assets_path = os.path.join(
     os.path.dirname(
@@ -19,10 +20,18 @@ assets_path = os.path.join(
 with open(os.path.join(assets_path, 'items.json')) as f:
     item_data = {x['text_type']: x for x in json.load(f)}
 
+with open(os.path.join(assets_path, 'entities.json')) as f:
+    entities_data = {x['text_type']: x for x in json.load(f)}
 
-def img_fname(item_name):
+
+def item_img_fname(item_name):
     if item_name in item_data:
         return "{type}-{meta}.png".format(**item_data[item_name])
+
+
+def entity_img_fname(entity_name):
+    if entity_name in entities_data:
+        return "{type}.png".format(**item_data[entity_name])
 
 
 def eprint(s):
@@ -141,7 +150,7 @@ def export(server_path, test=False, as_json=False):
         return dict(
             name=name.capitalize(),
             count=offer_item['Count'].value,
-            img=img_fname(name)
+            img=item_img_fname(name)
         )
 
     profession_count = dict()
