@@ -14,16 +14,6 @@ __version__ = '201112.1'
 item_data = {}
 entities_data = {}
 
-assets_path = os.path.join(
-    os.path.dirname(
-        os.path.dirname(
-            os.path.realpath(__file__))), 'assets')
-with open(os.path.join(assets_path, 'items.json')) as f:
-    item_data = {x['text_type']: x for x in json.load(f)}
-
-with open(os.path.join(assets_path, 'entities.json')) as f:
-    entities_data = {x['text_type']: x for x in json.load(f)}
-
 
 _roman = {
     1: 'I',
@@ -64,7 +54,7 @@ def coord_to_region(x, z):
 
 
 def lp(d):
-    return d.value.split(':')[1]
+    return d.split(':')[1]
 
 
 def chuck_map(startx, endx, startz, endz):
@@ -160,12 +150,13 @@ def export(server_path, test=False, as_json=False):
         return lp(iid).capitalize().replace('_', ' ')
 
     def to_dict(offer_item):
-        name = to_name(offer_item['id'])
+        raw_name = offer_item['id'].value
+        name = to_name(raw_name)
 
         rd = dict(
             name=name.capitalize(),
             count=offer_item['Count'].value,
-            img=item_img_fname(name)
+            img=lp(raw_name)+'.png'
         )
 
         if 'tag' in offer_item:
@@ -173,7 +164,7 @@ def export(server_path, test=False, as_json=False):
                 if offer_item['tag']['Enchantments']:
                     ea = list()
                     for e in offer_item['tag']['Enchantments']:
-                        ea.append("{} {}".format(to_name(e['id']), _roman[e['lvl'].value]))
+                        ea.append("{} {}".format(to_name(e['id'].value), _roman[e['lvl'].value]))
 
                     print(ea)
                     rd['enchantments'] = ea
@@ -195,7 +186,7 @@ def export(server_path, test=False, as_json=False):
                     for e in entities:
                         if e['id'].value == 'minecraft:villager':
                             v = dict(
-                                profession=lp(e['VillagerData']['profession']).capitalize(),
+                                profession=lp(e['VillagerData']['profession'].value).capitalize(),
                                 level=e['VillagerData']['level'].value,
                                 xp=e['Xp'].value,
                                 pos=[round(x.value) for x in e['Pos']],
