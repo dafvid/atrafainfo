@@ -112,7 +112,7 @@ def region_fn(start, end):
         yield "r.{0}.{1}.mca".format(*d)
 
 
-def export(server_path, test=False, as_json=False):
+def export(server_path, test=False):
     now = datetime.now()
     startx = 225
     endx = 310
@@ -121,30 +121,19 @@ def export(server_path, test=False, as_json=False):
 
     data_path = os.path.join(server_path, 'world', 'region')
 
-    jenv = Environment(
-        loader=PackageLoader('atrafadata'),
-        autoescape=select_autoescape(['html']),
-        trim_blocks=True,
-        lstrip_blocks=True
-    )
-
     cm = chuck_map(startx, endx, startz, endz)
     #eprint(pformat(cm))
 
     data = dict(
-        buy=dict(),
-        sell=dict(),
-        villagers=dict()
+        buy=list(),
+        sell=list(),
+        villagers=dict(),
     )
 
-    def list_add(list_name, item_name, offer):
-        if item_name not in data[list_name]:
-            if test and len(data[list_name].keys()) == 3:
-                return
-            data[list_name][item_name] = list()
-        elif test and len(data[list_name][item_name]) == 3:
+    def list_add(list_name, offer):
+        if test and len(data[list_name]) == 5:
             return
-        data[list_name][item_name].append(offer)
+        data[list_name].append(offer)
 
     def to_name(iid):
         return lp(iid).capitalize().replace('_', ' ')
@@ -210,20 +199,24 @@ def export(server_path, test=False, as_json=False):
                                 if o['buyB']['id'].value != 'minecraft:air':
                                     od['buyB'] = to_dict(o['buyB'])
 
-                                list_add('sell', od['buy']['name'], od)
-                                if od['buyB']:
-                                    list_add('sell', od['buyB']['name'], od)
-                                list_add('buy', od['sell']['name'], od)
+                                if od['sell']['name'] == 'Emerald':
+                                    list_add('sell', od)
+                                else:
+                                    list_add('buy', od)
                                 v['offers'].append(od)
                                 #print("  {} {} -> {} {}".format(o['buy']['Count'], lp(o['buy']['id']).capitalize(), o['sell']['Count'], lp(o['sell']['id']).capitalize()))
                             data['villagers'][v['name']] = v
     #eprint(pformat(data))
     data['timestamp'] = now.strftime('%Y-%m-%d %H.%M.%S')
-    data['buy_keys'] = sorted(data['buy'].keys())
-    data['sell_keys'] = sorted(data['sell'].keys())
+
+    def sell_key(x):
+        key = x['buy']['name']
+        if x['buyB']:
+            key += x['buyB']['name']
+        return key
+
+    data['sell'].sort(key=sell_key)
+    data['buy'].sort(key=lambda x: x['sell']['name'])
     data['villager_keys'] = sorted(data['villagers'].keys())
-    if as_json:
-        return json.dumps(data)
-    else:
-        t = jenv.get_template('index.html')
-        return t.render(data=data)
+
+    return json.dumps(data)

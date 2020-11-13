@@ -18,12 +18,8 @@ server_path = sys.argv[1]
 if not os.path.exists(server_path):
     sys.exit("Can't find minecraft data folder ({})".format(server_path))
 
-with open('www/index.html', 'w') as f:
-    f.writelines(export(server_path, test=True))
-    eprint("Created new www/index.html")
-
 with open('www/data.json', 'w') as f:
-    f.writelines(export(server_path, test=False, as_json=True))
+    f.writelines(export(server_path, test=False))
     eprint("Created new www/data.json")
 
 
