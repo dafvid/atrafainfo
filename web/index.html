@@ -7,142 +7,46 @@
 
     <title>Atrafa Overview</title>
     <link rel="stylesheet" href="css/styles.css?v=1.0">
+    <script src="script.js"></script>
 </head>
 
 <body>
+Genererad: <span id="date_span"></span>
 <h2>Sälj</h2>
-<ul>
-    <!-- Start of buy item -->
-<li>
-    Wheat
-    <ul>
-        <!-- Start of buy offer -->
-            <li>
-                <img src="img/296-0.png"/>20 Wheat
-                --> <img src="img/388-0.png"/>1 Emerald @ Farmer 1
-            </li>
-        <!-- End of buy offer -->
-    </ul>
-</li>
-    <!-- End of buy item -->
-    <!-- Start of buy item -->
-<li>
-    Emerald
-    <ul>
-        <!-- Start of buy offer -->
-            <li>
-                <img src="img/388-0.png"/>1 Emerald
-                --> <img src="img/297-0.png"/>6 Bread @ Farmer 1
-            </li>
-        <!-- End of buy offer -->
-        <!-- Start of buy offer -->
-            <li>
-                <img src="img/388-0.png"/>1 Emerald
-                --> <img src="img/260-0.png"/>4 Apple @ Farmer 1
-            </li>
-        <!-- End of buy offer -->
-        <!-- Start of buy offer -->
-            <li>
-                <img src="img/388-0.png"/>3 Emerald
-                --> <img src="img/357-0.png"/>18 Cookie @ Farmer 1
-            </li>
-        <!-- End of buy offer -->
-    </ul>
-</li>
-    <!-- End of buy item -->
-    <!-- Start of buy item -->
-<li>
-    Pumpkin
-    <ul>
-        <!-- Start of buy offer -->
-            <li>
-                <img src="img/86-0.png"/>6 Pumpkin
-                --> <img src="img/388-0.png"/>1 Emerald @ Farmer 1
-            </li>
-        <!-- End of buy offer -->
-    </ul>
-</li>
-    <!-- End of buy item -->
-</ul>
+<table>
+    <thead>
+    <tr>
+        <th colspan="2">Items</th>
+        <th>Emerald</th>
+        <th>Villager</th>
+    </tr>
+    </thead>
+    <tbody id="sell_body"></tbody>
+</table>
 
 <h2>Köp</h2>
-<ul>
-    <!-- Start of sell item -->
-    <li>
-        Emerald
-        <ul>
-            <!-- Start of sell offer -->
-            <li>
-                <img src="img/296-0.png"/>20 Wheat
-                --> <img src="img/388-0.png"/>1 Emerald @ Farmer 1
-            </li>
-            <!-- End of sell offer -->
-            <!-- Start of sell offer -->
-            <li>
-                <img src="img/86-0.png"/>6 Pumpkin
-                --> <img src="img/388-0.png"/>1 Emerald @ Farmer 1
-            </li>
-            <!-- End of sell offer -->
-            <!-- Start of sell offer -->
-            <li>
-                <img src="img/360-0.png"/>4 Melon
-                --> <img src="img/388-0.png"/>1 Emerald @ Farmer 1
-            </li>
-            <!-- End of sell offer -->
-        </ul>
-    </li>
-    <!-- End of sell item -->
-    <!-- Start of sell item -->
-    <li>
-        Bread
-        <ul>
-            <!-- Start of sell offer -->
-            <li>
-                <img src="img/388-0.png"/>1 Emerald
-                --> <img src="img/297-0.png"/>6 Bread @ Farmer 1
-            </li>
-            <!-- End of sell offer -->
-        </ul>
-    </li>
-    <!-- End of sell item -->
-    <!-- Start of sell item -->
-    <li>
-        Apple
-        <ul>
-            <!-- Start of sell offer -->
-            <li>
-                <img src="img/388-0.png"/>1 Emerald
-                --> <img src="img/260-0.png"/>4 Apple @ Farmer 1
-            </li>
-            <!-- End of sell offer -->
-        </ul>
-    </li>
-    <!-- End of sell item -->
-</ul>
+<table>
+    <thead>
+    <tr>
+        <th colspan="2">Pris</th>
+        <th>Items</th>
+        <th>Villager</th>
+    </tr>
+    </thead>
+    <tbody id="buy_body"></tbody>
+</table>
 
 <h2>Vem bor i byn?</h2>
-<ul>
-    <!-- Start of villager item -->
-<li>Farmer 1 lvl 5(734 XP) @ [233, 70, -42]</li>
-    <!-- End of villager item -->
-    <!-- Start of villager item -->
-<li>Fletcher 1 lvl 5(280 XP) @ [266, 70, -17]</li>
-    <!-- End of villager item -->
-    <!-- Start of villager item -->
-<li>Armorer 1 lvl 5(304 XP) @ [266, 70, -24]</li>
-    <!-- End of villager item -->
-    <!-- Start of villager item -->
-<li>Cartographer 1 lvl 5(387 XP) @ [266, 70, -6]</li>
-    <!-- End of villager item -->
-    <!-- Start of villager item -->
-<li>Weaponsmith 1 lvl 5(322 XP) @ [284, 70, -20]</li>
-    <!-- End of villager item -->
-    <!-- Start of villager item -->
-<li>Fisherman 1 lvl 4(152 XP) @ [284, 70, -26]</li>
-    <!-- End of villager item -->
-    <!-- Start of villager item -->
-<li>Leatherworker 1 lvl 5(270 XP) @ [284, 70, -14]</li>
-    <!-- End of villager item -->
-</ul>
+<table>
+    <thead>
+    <tr>
+        <th>Namn</th>
+        <th>Lvl</th>
+        <th>Exp</th>
+    </tr>
+    </thead>
+    <tbody id="villager_body"></tbody>
+</table>
+
 </body>
 </html>

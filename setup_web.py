@@ -17,8 +17,4 @@ print("Extracting item icons")
 with zipfile.ZipFile(os.path.join(dir_path, 'assets/items.zip'), 'r') as zf:
     zf.extractall('www/img')
 
-print("Extracting entities icons")
-with zipfile.ZipFile(os.path.join(dir_path, 'assets/entities.zip'), 'r') as zf:
-    zf.extractall('www/img')
-
 print("Done!")

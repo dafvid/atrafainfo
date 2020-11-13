@@ -1,7 +1,7 @@
 import os
 import sys
 
-from atrafadata import export
+from atrafadata import export, eprint
 
 args = sys.argv
 
@@ -18,7 +18,9 @@ server_path = sys.argv[1]
 if not os.path.exists(server_path):
     sys.exit("Can't find minecraft data folder ({})".format(server_path))
 
-print(export(server_path, as_json=as_json))
+with open('www/data.json', 'w') as f:
+    f.writelines(export(server_path, test=False))
+    eprint("Created new www/data.json")
 
 
 

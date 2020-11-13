@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 import os
 import sys
@@ -13,15 +14,14 @@ __version__ = '201112.1'
 item_data = {}
 entities_data = {}
 
-assets_path = os.path.join(
-    os.path.dirname(
-        os.path.dirname(
-            os.path.realpath(__file__))), 'assets')
-with open(os.path.join(assets_path, 'items.json')) as f:
-    item_data = {x['text_type']: x for x in json.load(f)}
 
-with open(os.path.join(assets_path, 'entities.json')) as f:
-    entities_data = {x['text_type']: x for x in json.load(f)}
+_roman = {
+    1: 'I',
+    2: 'II',
+    3: 'III',
+    4: 'IV',
+    5: 'V'
+}
 
 
 def item_img_fname(item_name):
@@ -54,7 +54,7 @@ def coord_to_region(x, z):
 
 
 def lp(d):
-    return d.value.split(':')[1]
+    return d.split(':')[1]
 
 
 def chuck_map(startx, endx, startz, endz):
@@ -112,7 +112,8 @@ def region_fn(start, end):
         yield "r.{0}.{1}.mca".format(*d)
 
 
-def export(server_path, test=False, as_json=False):
+def export(server_path, test=False):
+    now = datetime.now()
     startx = 225
     endx = 310
     startz = -60
@@ -120,38 +121,44 @@ def export(server_path, test=False, as_json=False):
 
     data_path = os.path.join(server_path, 'world', 'region')
 
-    jenv = Environment(
-        loader=PackageLoader('atrafadata'),
-        autoescape=select_autoescape(['html']),
-        trim_blocks=True,
-        lstrip_blocks=True
-    )
-
     cm = chuck_map(startx, endx, startz, endz)
     #eprint(pformat(cm))
 
     data = dict(
-        buy=dict(),
-        sell=dict(),
-        villagers=dict()
+        buy=list(),
+        sell=list(),
+        villagers=dict(),
     )
 
-    def list_add(list_name, item_name, offer):
-        if item_name not in data[list_name]:
-            if test and len(data[list_name].keys()) == 3:
-                return
-            data[list_name][item_name] = list()
-        elif test and len(data[list_name][item_name]) == 3:
+    def list_add(list_name, offer):
+        if test and len(data[list_name]) == 5:
             return
-        data[list_name][item_name].append(offer)
+        data[list_name].append(offer)
+
+    def to_name(iid):
+        return lp(iid).capitalize().replace('_', ' ')
 
     def to_dict(offer_item):
-        name = lp(offer_item['id']).replace('_', ' ')
-        return dict(
+        raw_name = offer_item['id'].value
+        name = to_name(raw_name)
+
+        rd = dict(
             name=name.capitalize(),
             count=offer_item['Count'].value,
-            img=item_img_fname(name)
+            img=lp(raw_name)+'.png'
         )
+
+        if 'tag' in offer_item:
+            if 'Enchantments' in offer_item['tag']:
+                if offer_item['tag']['Enchantments']:
+                    ea = list()
+                    for e in offer_item['tag']['Enchantments']:
+                        ea.append("{} {}".format(to_name(e['id'].value), _roman[e['lvl'].value]))
+
+                    print(ea)
+                    rd['enchantments'] = ea
+
+        return rd
 
     profession_count = dict()
 
@@ -168,7 +175,7 @@ def export(server_path, test=False, as_json=False):
                     for e in entities:
                         if e['id'].value == 'minecraft:villager':
                             v = dict(
-                                profession=lp(e['VillagerData']['profession']).capitalize(),
+                                profession=lp(e['VillagerData']['profession'].value).capitalize(),
                                 level=e['VillagerData']['level'].value,
                                 xp=e['Xp'].value,
                                 pos=[round(x.value) for x in e['Pos']],
@@ -192,16 +199,24 @@ def export(server_path, test=False, as_json=False):
                                 if o['buyB']['id'].value != 'minecraft:air':
                                     od['buyB'] = to_dict(o['buyB'])
 
-                                list_add('buy', od['buy']['name'], od)
-                                if od['buyB']:
-                                    list_add('buy', od['buyB']['name'], od)
-                                list_add('sell', od['sell']['name'], od)
+                                if od['sell']['name'] == 'Emerald':
+                                    list_add('sell', od)
+                                else:
+                                    list_add('buy', od)
                                 v['offers'].append(od)
                                 #print("  {} {} -> {} {}".format(o['buy']['Count'], lp(o['buy']['id']).capitalize(), o['sell']['Count'], lp(o['sell']['id']).capitalize()))
                             data['villagers'][v['name']] = v
     #eprint(pformat(data))
-    if as_json:
-        return json.dumps(data)
-    else:
-        t = jenv.get_template('index.html')
-        return t.render(data=data)
+    data['timestamp'] = now.strftime('%Y-%m-%d %H.%M.%S')
+
+    def sell_key(x):
+        key = x['buy']['name']
+        if x['buyB']:
+            key += x['buyB']['name']
+        return key
+
+    data['sell'].sort(key=sell_key)
+    data['buy'].sort(key=lambda x: x['sell']['name'])
+    data['villager_keys'] = sorted(data['villagers'].keys())
+
+    return json.dumps(data)
