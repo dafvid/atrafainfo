@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 import os
 import sys
@@ -113,6 +114,7 @@ def region_fn(start, end):
 
 
 def export(server_path, test=False, as_json=False):
+    now = datetime.now()
     startx = 225
     endx = 310
     startz = -60
@@ -200,6 +202,10 @@ def export(server_path, test=False, as_json=False):
                                 #print("  {} {} -> {} {}".format(o['buy']['Count'], lp(o['buy']['id']).capitalize(), o['sell']['Count'], lp(o['sell']['id']).capitalize()))
                             data['villagers'][v['name']] = v
     #eprint(pformat(data))
+    data['timestamp'] = now.strftime('%Y-%m-%d %H.%M.%S')
+    data['buy_keys'] = sorted(data['buy'].keys())
+    data['sell_keys'] = sorted(data['sell'].keys())
+    data['villager_keys'] = sorted(data['villagers'].keys())
     if as_json:
         return json.dumps(data)
     else:
