@@ -7,10 +7,11 @@ from pprint import pformat
 import anvil
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-__version__ = '201109.1'
+__version__ = '201112.1'
 
 
 item_data = {}
+entities_data = {}
 
 assets_path = os.path.join(
     os.path.dirname(
@@ -19,10 +20,18 @@ assets_path = os.path.join(
 with open(os.path.join(assets_path, 'items.json')) as f:
     item_data = {x['text_type']: x for x in json.load(f)}
 
+with open(os.path.join(assets_path, 'entities.json')) as f:
+    entities_data = {x['text_type']: x for x in json.load(f)}
 
-def img_fname(item_name):
+
+def item_img_fname(item_name):
     if item_name in item_data:
         return "{type}-{meta}.png".format(**item_data[item_name])
+
+
+def entity_img_fname(entity_name):
+    if entity_name in entities_data:
+        return "{type}.png".format(**item_data[entity_name])
 
 
 def eprint(s):
@@ -103,7 +112,7 @@ def region_fn(start, end):
         yield "r.{0}.{1}.mca".format(*d)
 
 
-def export(server_path, test=False):
+def export(server_path, test=False, as_json=False):
     startx = 225
     endx = 310
     startz = -60
@@ -124,7 +133,7 @@ def export(server_path, test=False):
     data = dict(
         buy=dict(),
         sell=dict(),
-        villagers=list()
+        villagers=dict()
     )
 
     def list_add(list_name, item_name, offer):
@@ -137,12 +146,14 @@ def export(server_path, test=False):
         data[list_name][item_name].append(offer)
 
     def to_dict(offer_item):
-        name = lp(offer_item['id'])
+        name = lp(offer_item['id']).replace('_', ' ')
         return dict(
             name=name.capitalize(),
             count=offer_item['Count'].value,
-            img=img_fname(name)
+            img=item_img_fname(name)
         )
+
+    profession_count = dict()
 
     for rk, rv in cm.items():
         fp = "r.{0}.{1}.mca".format(*rk)
@@ -160,15 +171,22 @@ def export(server_path, test=False):
                                 profession=lp(e['VillagerData']['profession']).capitalize(),
                                 level=e['VillagerData']['level'].value,
                                 xp=e['Xp'].value,
-                                pos=[round(x.value) for x in e['Pos']]
+                                pos=[round(x.value) for x in e['Pos']],
+                                offers=list()
                             )
+                            p = v['profession']
+                            if p not in profession_count:
+                                profession_count[p] = 1
+                            else:
+                                profession_count[p] += 1
+                            v['name'] = "{} {}".format(p, profession_count[p])
                             v['offers'] = list()
                             for o in e['Offers']['Recipes']:
                                 od = {
                                     'buy': to_dict(o['buy']),
                                     'buyB': dict(),
                                     'sell': to_dict(o['sell']),
-                                    'villager': v
+                                    'villager': v['name']
                                 }
                                 # Check buyB
                                 if o['buyB']['id'].value != 'minecraft:air':
@@ -180,7 +198,10 @@ def export(server_path, test=False):
                                 list_add('sell', od['sell']['name'], od)
                                 v['offers'].append(od)
                                 #print("  {} {} -> {} {}".format(o['buy']['Count'], lp(o['buy']['id']).capitalize(), o['sell']['Count'], lp(o['sell']['id']).capitalize()))
-                            data['villagers'].append(v)
-    eprint(pformat(data))
-    t = jenv.get_template('index.html')
-    return t.render(data=data)
+                            data['villagers'][v['name']] = v
+    #eprint(pformat(data))
+    if as_json:
+        return json.dumps(data)
+    else:
+        t = jenv.get_template('index.html')
+        return t.render(data=data)
