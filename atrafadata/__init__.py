@@ -25,6 +25,15 @@ with open(os.path.join(assets_path, 'entities.json')) as f:
     entities_data = {x['text_type']: x for x in json.load(f)}
 
 
+_roman = {
+    1: 'I',
+    2: 'II',
+    3: 'III',
+    4: 'IV',
+    5: 'V'
+}
+
+
 def item_img_fname(item_name):
     if item_name in item_data:
         return "{type}-{meta}.png".format(**item_data[item_name])
@@ -147,13 +156,29 @@ def export(server_path, test=False, as_json=False):
             return
         data[list_name][item_name].append(offer)
 
+    def to_name(iid):
+        return lp(iid).capitalize().replace('_', ' ')
+
     def to_dict(offer_item):
-        name = lp(offer_item['id']).replace('_', ' ')
-        return dict(
+        name = to_name(offer_item['id'])
+
+        rd = dict(
             name=name.capitalize(),
             count=offer_item['Count'].value,
             img=item_img_fname(name)
         )
+
+        if 'tag' in offer_item:
+            if 'Enchantments' in offer_item['tag']:
+                if offer_item['tag']['Enchantments']:
+                    ea = list()
+                    for e in offer_item['tag']['Enchantments']:
+                        ea.append("{} {}".format(to_name(e['id']), _roman[e['lvl'].value]))
+
+                    print(ea)
+                    rd['enchantments'] = ea
+
+        return rd
 
     profession_count = dict()
 
@@ -194,10 +219,10 @@ def export(server_path, test=False, as_json=False):
                                 if o['buyB']['id'].value != 'minecraft:air':
                                     od['buyB'] = to_dict(o['buyB'])
 
-                                list_add('buy', od['buy']['name'], od)
+                                list_add('sell', od['buy']['name'], od)
                                 if od['buyB']:
-                                    list_add('buy', od['buyB']['name'], od)
-                                list_add('sell', od['sell']['name'], od)
+                                    list_add('sell', od['buyB']['name'], od)
+                                list_add('buy', od['sell']['name'], od)
                                 v['offers'].append(od)
                                 #print("  {} {} -> {} {}".format(o['buy']['Count'], lp(o['buy']['id']).capitalize(), o['sell']['Count'], lp(o['sell']['id']).capitalize()))
                             data['villagers'][v['name']] = v
