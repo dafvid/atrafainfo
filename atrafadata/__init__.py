@@ -34,11 +34,7 @@ def entity_img_fname(entity_name):
         return "{type}.png".format(**item_data[entity_name])
 
 
-def eprint(s):
-    print(s, file=sys.stderr)
-
-
-eprint('atrafadata v.{}'.format(__version__))
+print('atrafadata v.{}'.format(__version__))
 
 
 def coord_to_chunk(x, z):
@@ -165,7 +161,7 @@ def export(server_path, test=False):
         fp = "r.{0}.{1}.mca".format(*rk)
         region_path = os.path.join(data_path, fp)
         if os.path.exists(region_path):
-            eprint("Parsing {}".format(region_path))
+            print("Parsing {}".format(region_path))
             r = anvil.Region.from_file(region_path)
             for ck, cv in rv.items():
                 c = r.chunk_data(*ck)
