@@ -8,7 +8,7 @@ from pprint import pformat
 import anvil
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-__version__ = '201112.1'
+__version__ = '201114.1'
 
 
 item_data = {}
@@ -155,7 +155,6 @@ def export(server_path, test=False):
                     for e in offer_item['tag']['Enchantments']:
                         ea.append("{} {}".format(to_name(e['id'].value), _roman[e['lvl'].value]))
 
-                    print(ea)
                     rd['enchantments'] = ea
 
         return rd
