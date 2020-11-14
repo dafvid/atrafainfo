@@ -1,5 +1,5 @@
 venv/*
 .idea/*
 www/*
-#web/index.html
 *__pycache__
+__MACOSX/*

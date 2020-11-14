@@ -4,12 +4,12 @@ function populate_table(name, data) {
         const r = tb.insertRow(-1)
 
         if ('name' in o.buyB){
-            r.insertCell(-1).innerHTML = o.buyB.count + ' ' +o.buyB.name
+            r.insertCell(-1).innerHTML = o.buyB.count + '&nbsp;<img src="img/'+o.buyB.img+'"/> '+o.buyB.name
         } else {
             r.insertCell(-1).innerHTML = ''
         }
-        r.insertCell(-1).innerHTML = o.buy.count + '&nbsp;' +o.buy.name
-        let sellHTML = '<div>'+o.sell.count + '&nbsp;' +o.sell.name+'</div>'
+        r.insertCell(-1).innerHTML = o.buy.count + '&nbsp;<img src="img/'+o.buy.img+'"/> ' +o.buy.name
+        let sellHTML = '<div>'+o.sell.count + '&nbsp;<img src="img/'+o.sell.img+'"/> '+o.sell.name+'</div>'
         if ('enchantments' in o.sell) {
             for (e of o.sell.enchantments) {
                 sellHTML += '<div><small>'+e+'</small></div>'
