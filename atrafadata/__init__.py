@@ -1,14 +1,10 @@
 from datetime import datetime
 import json
 import os
-import sys
-
-from pprint import pformat
 
 import anvil
-from jinja2 import Environment, PackageLoader, select_autoescape
 
-__version__ = '201112.1'
+__version__ = '201124.1'
 
 
 item_data = {}
@@ -34,11 +30,7 @@ def entity_img_fname(entity_name):
         return "{type}.png".format(**item_data[entity_name])
 
 
-def eprint(s):
-    print(s, file=sys.stderr)
-
-
-eprint('atrafadata v.{}'.format(__version__))
+print('atrafadata v.{}'.format(__version__))
 
 
 def coord_to_chunk(x, z):
@@ -57,7 +49,7 @@ def lp(d):
     return d.split(':')[1]
 
 
-def chuck_map(startx, endx, startz, endz):
+def chunk_map(startx, endx, startz, endz):
     rd = dict()
     xd = endx - startx
     zd = endz - startz
@@ -121,7 +113,7 @@ def export(server_path, test=False):
 
     data_path = os.path.join(server_path, 'world', 'region')
 
-    cm = chuck_map(startx, endx, startz, endz)
+    cm = chunk_map(startx, endx, startz, endz)
     #eprint(pformat(cm))
 
     data = dict(
@@ -155,7 +147,6 @@ def export(server_path, test=False):
                     for e in offer_item['tag']['Enchantments']:
                         ea.append("{} {}".format(to_name(e['id'].value), _roman[e['lvl'].value]))
 
-                    print(ea)
                     rd['enchantments'] = ea
 
         return rd
@@ -166,7 +157,7 @@ def export(server_path, test=False):
         fp = "r.{0}.{1}.mca".format(*rk)
         region_path = os.path.join(data_path, fp)
         if os.path.exists(region_path):
-            eprint("Parsing {}".format(region_path))
+            print("Parsing {}".format(region_path))
             r = anvil.Region.from_file(region_path)
             for ck, cv in rv.items():
                 c = r.chunk_data(*ck)
@@ -193,7 +184,8 @@ def export(server_path, test=False):
                                     'buy': to_dict(o['buy']),
                                     'buyB': dict(),
                                     'sell': to_dict(o['sell']),
-                                    'villager': v['name']
+                                    'villager': v['name'],
+                                    'uses_left': o['maxUses'].value - o['uses'].value
                                 }
                                 # Check buyB
                                 if o['buyB']['id'].value != 'minecraft:air':
@@ -205,6 +197,7 @@ def export(server_path, test=False):
                                     list_add('buy', od)
                                 v['offers'].append(od)
                                 #print("  {} {} -> {} {}".format(o['buy']['Count'], lp(o['buy']['id']).capitalize(), o['sell']['Count'], lp(o['sell']['id']).capitalize()))
+                            v['offers'].sort(key=lambda x: x['buy']['name'])
                             data['villagers'][v['name']] = v
     #eprint(pformat(data))
     data['timestamp'] = now.strftime('%Y-%m-%d %H.%M.%S')
