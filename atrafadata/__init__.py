@@ -1,14 +1,10 @@
 from datetime import datetime
 import json
 import os
-import sys
-
-from pprint import pformat
 
 import anvil
-from jinja2 import Environment, PackageLoader, select_autoescape
 
-__version__ = '201114.1'
+__version__ = '201119.1'
 
 
 item_data = {}
@@ -53,7 +49,7 @@ def lp(d):
     return d.split(':')[1]
 
 
-def chuck_map(startx, endx, startz, endz):
+def chunk_map(startx, endx, startz, endz):
     rd = dict()
     xd = endx - startx
     zd = endz - startz
@@ -117,7 +113,7 @@ def export(server_path, test=False):
 
     data_path = os.path.join(server_path, 'world', 'region')
 
-    cm = chuck_map(startx, endx, startz, endz)
+    cm = chunk_map(startx, endx, startz, endz)
     #eprint(pformat(cm))
 
     data = dict(
@@ -188,7 +184,8 @@ def export(server_path, test=False):
                                     'buy': to_dict(o['buy']),
                                     'buyB': dict(),
                                     'sell': to_dict(o['sell']),
-                                    'villager': v['name']
+                                    'villager': v['name'],
+                                    'uses_left': o['maxUses'].value - o['uses'].value
                                 }
                                 # Check buyB
                                 if o['buyB']['id'].value != 'minecraft:air':
@@ -200,6 +197,7 @@ def export(server_path, test=False):
                                     list_add('buy', od)
                                 v['offers'].append(od)
                                 #print("  {} {} -> {} {}".format(o['buy']['Count'], lp(o['buy']['id']).capitalize(), o['sell']['Count'], lp(o['sell']['id']).capitalize()))
+                            v['offers'].sort(key=lambda x: x['buy']['name'])
                             data['villagers'][v['name']] = v
     #eprint(pformat(data))
     data['timestamp'] = now.strftime('%Y-%m-%d %H.%M.%S')
