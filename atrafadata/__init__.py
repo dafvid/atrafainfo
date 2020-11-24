@@ -4,7 +4,7 @@ import os
 
 import anvil
 
-__version__ = '201119.1'
+__version__ = '201124.1'
 
 
 item_data = {}
