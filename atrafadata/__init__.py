@@ -4,7 +4,7 @@ import os
 
 import anvil
 
-__version__ = '201124.1'
+__version__ = '201124.2'
 
 
 item_data = {}
@@ -18,6 +18,11 @@ _roman = {
     4: 'IV',
     5: 'V'
 }
+
+
+def box(center_x, center_z, side):
+    d = int(side/2)
+    return center_x - d, center_x + d, center_z - d, center_z + d
 
 
 def item_img_fname(item_name):

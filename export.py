@@ -1,7 +1,7 @@
 import os
 import sys
 
-from atrafadata import export, eprint
+from atrafadata import export
 
 args = sys.argv
 
