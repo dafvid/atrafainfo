@@ -190,7 +190,7 @@ def export(server_path, test=False):
                                     'buyB': dict(),
                                     'sell': to_dict(o['sell']),
                                     'villager': v['name'],
-                                    'uses_left': o['maxUses'].value - o['uses'].value
+                                    'usesLeft': o['maxUses'].value - o['uses'].value
                                 }
                                 # Check buyB
                                 if o['buyB']['id'].value != 'minecraft:air':
