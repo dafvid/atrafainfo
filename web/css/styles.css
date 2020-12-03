@@ -1,0 +1,17 @@
+table {
+    border: 5px outset black;
+}
+
+th {
+    border: 2px solid black;
+}
+
+td {
+    border: 1px solid grey;
+}
+
+th, td {
+    padding: 2px;
+}
+
+
