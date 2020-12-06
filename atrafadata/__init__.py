@@ -19,6 +19,14 @@ _roman = {
     5: 'V'
 }
 
+_title = {
+    1: {'name': 'Novice', 'next_lvl': 10},
+    2: {'name': 'Apprentice', 'next_lvl': 70},
+    3: {'name': 'Journeyman', 'next_lvl': 150},
+    4: {'name': 'Expert', 'next_lvl': 250},
+    5: {'name': 'Master', 'next_lvl': 0},
+}
+
 
 def box(center_x, center_z, side):
     d = int(side/2)
@@ -175,7 +183,8 @@ def export(server_path, test=False):
                                 level=e['VillagerData']['level'].value,
                                 xp=e['Xp'].value,
                                 pos=[round(x.value) for x in e['Pos']],
-                                offers=list()
+                                offers=list(),
+                                title=_title[e['VillagerData']['level'].value]
                             )
                             p = v['profession']
                             if p not in profession_count:
@@ -184,25 +193,30 @@ def export(server_path, test=False):
                                 profession_count[p] += 1
                             v['name'] = "{} {}".format(p, profession_count[p])
                             v['offers'] = list()
-                            for o in e['Offers']['Recipes']:
-                                od = {
-                                    'buy': to_dict(o['buy']),
-                                    'buyB': dict(),
-                                    'sell': to_dict(o['sell']),
-                                    'villager': v['name'],
-                                    'usesLeft': o['maxUses'].value - o['uses'].value
-                                }
-                                # Check buyB
-                                if o['buyB']['id'].value != 'minecraft:air':
-                                    od['buyB'] = to_dict(o['buyB'])
+                            if 'Offers' in e:
+                                for o in e['Offers']['Recipes']:
+                                    od = {
+                                        'buy': to_dict(o['buy']),
+                                        'buyB': dict(),
+                                        'sell': to_dict(o['sell']),
+                                        'villager': v['name'],
+                                        'usesLeft': o['maxUses'].value - o['uses'].value
+                                    }
+                                    # Check buyB
+                                    if o['buyB']['id'].value != 'minecraft:air':
+                                        od['buyB'] = to_dict(o['buyB'])
 
-                                if od['sell']['name'] == 'Emerald':
-                                    list_add('sell', od)
-                                else:
-                                    list_add('buy', od)
-                                v['offers'].append(od)
-                                #print("  {} {} -> {} {}".format(o['buy']['Count'], lp(o['buy']['id']).capitalize(), o['sell']['Count'], lp(o['sell']['id']).capitalize()))
-                            v['offers'].sort(key=lambda x: x['buy']['name'])
+                                    if od['sell']['name'] == 'Emerald':
+                                        list_add('sell', od)
+                                    else:
+                                        list_add('buy', od)
+                                    v['offers'].append(od)
+                                    #print("  {} {} -> {} {}".format(o['buy']['Count'], lp(o['buy']['id']).capitalize(), o['sell']['Count'], lp(o['sell']['id']).capitalize()))
+                                v['offers'].sort(key=lambda x: x['buy']['name'])
+                            if 'memories' in e['Brain']:
+                                m = e['Brain']['memories']
+                                if 'minecraft:job_site' in m:
+                                    print(m['minecraft:job_site']['value'])
                             data['villagers'][v['name']] = v
     #eprint(pformat(data))
     data['timestamp'] = now.strftime('%Y-%m-%d %H.%M.%S')
@@ -218,3 +232,4 @@ def export(server_path, test=False):
     data['villager_keys'] = sorted(data['villagers'].keys())
 
     return json.dumps(data)
+
